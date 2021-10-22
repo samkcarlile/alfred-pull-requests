@@ -1,0 +1,13 @@
+{
+  "root": true,
+  "extends": ["problems", "prettier"],
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "parserOptions": { "ecmaVersion": 2020, "sourceType": "module" },
+  "rules": {
+    "no-console": "off",
+    "no-use-before-define": "off"
+  }
+}
