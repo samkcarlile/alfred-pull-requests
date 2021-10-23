@@ -28,10 +28,20 @@ const repos = process.env['REPOS']
   .map((s) => s.split('/'));
 
 const pullRequestsByRepo = await Promise.all(
-  repos.map(([owner, repo]) => getPullRequests({ owner, repo, state: 'all' }))
+  repos.map(([owner, repo]) =>
+    getPullRequests({
+      owner,
+      repo,
+      state: 'all',
+      per_page: 20,
+      sort: (process.env['SORT'] ?? 'created_at').slice(-4) as
+        | 'created'
+        | 'updated',
+    })
+  )
 );
 
-let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
+let sortedPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
   const dateProp: keyof PullRequest = (process.env['SORT'] ?? 'created_at') as
     | 'created_at'
     | 'updated_at';
@@ -42,14 +52,14 @@ let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
   if (aState === bState) {
     return b[dateProp].getTime() - a[dateProp].getTime();
   } else {
-    return bState - aState;
+    return bState > aState ? 1 : -1;
   }
 });
 
-const query = alfy.input?.toLowerCase();
+const query = alfy.input?.toLowerCase().trim();
 if (query && query.length) {
   // TODO: more sophisticated querying: identify tokens and match the to properties
-  filteredPulls = filteredPulls.filter((pr) => {
+  sortedPulls = [...sortedPulls].filter((pr) => {
     return [pr.body, pr.title]
       .filter(Boolean)
       .map((text) => text.toLowerCase().includes(query))
@@ -58,7 +68,7 @@ if (query && query.length) {
 }
 
 alfy.output(
-  filteredPulls.map((pr) => {
+  sortedPulls.map((pr) => {
     const title = `(${pr.number}) ${pr.title}`;
     const relativeDate = formatDateRelative(pr.updated_at);
     const author = pr.user.login;

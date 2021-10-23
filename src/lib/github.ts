@@ -47,8 +47,9 @@ export async function getPullRequests({
     owner,
     repo,
     state,
-    sort,
     per_page,
+    sort,
+    direction: 'desc',
   });
   _();
 
