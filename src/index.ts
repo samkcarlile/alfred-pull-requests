@@ -46,6 +46,16 @@ let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
   }
 });
 
+const query = alfy.input?.toLowerCase();
+if (query) {
+  filteredPulls = filteredPulls.filter((pr) => {
+    return [pr.body, pr.title]
+      .filter(Boolean)
+      .map((text) => text.toLowerCase().includes(query))
+      .some((e) => e);
+  });
+}
+
 alfy.output(
   filteredPulls.map((pr) => {
     const title = `(${pr.number}) ${pr.title}`;
