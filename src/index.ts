@@ -67,7 +67,7 @@ alfy.output(
     return {
       uid: pr.node_id,
       title,
-      subtitle: `${repo} – by ${author} – Updated ${relativeDate}`,
+      subtitle: `${repo} • by ${author} • Updated ${relativeDate}`,
       arg: pr.html_url,
       icon: { path: getIconPath(pr.state) },
     };
