@@ -1,10 +1,27 @@
 import alfy from 'alfy';
-import { formatDateRelative, getIconPath, ordinalScale } from './lib/util.js';
 import {
-  getPullRequests,
+  formatDateRelative,
+  getIconPath,
+  ordinalScale,
+  reviveDateProperties,
+} from './lib/util.js';
+import {
+  getPullRequests as _getPullRequests,
   parsePullRequestUrl,
   PullRequest,
 } from './lib/github.js';
+import { useCache } from './lib/cache.js';
+
+const getPullRequests = useCache(_getPullRequests, {
+  key: 'pull_requests',
+  expires: 1000 * 60,
+  reviver: reviveDateProperties<PullRequest>([
+    'updated_at',
+    'created_at',
+    'merged_at',
+    'closed_at',
+  ]),
+});
 
 const repos = process.env['REPOS']
   .split(',')
@@ -14,12 +31,6 @@ const repos = process.env['REPOS']
 const pullRequestsByRepo = await Promise.all(
   repos.map(([owner, repo]) => getPullRequests({ owner, repo, state: 'all' }))
 );
-
-const orderBy = (process.env['SORT'] ?? 'created') as 'created' | 'updated';
-const sortFn: (a: PullRequest, b: PullRequest) => number =
-  orderBy === 'created'
-    ? (a, b) => b.created_at.getTime() - a.created_at.getTime()
-    : (a, b) => b.updated_at.getTime() - a.updated_at.getTime();
 
 let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
   const dateProp: keyof PullRequest = (process.env['SORT'] ?? 'created_at') as
@@ -50,6 +61,9 @@ alfy.output(
       icon: { path: getIconPath(pr.state) },
     };
   })
+  // {
+  //   rerunInterval: 1,
+  // }
 );
 
 export {};

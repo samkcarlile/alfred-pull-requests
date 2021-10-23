@@ -1,6 +1,7 @@
 import { Octokit, RestEndpointMethodTypes } from '@octokit/rest';
 import { config as dotenv } from 'dotenv';
 dotenv();
+import { stopwatch } from './debug.js';
 
 type ElementOf<T extends any[]> = T extends (infer E)[] ? E : T;
 type Override<T, O> = Omit<T, keyof O> & O;
@@ -40,13 +41,18 @@ export async function getPullRequests({
   sort = 'created',
   per_page = 50,
 }: QueryOptions) {
-  const { data, headers, status } = await octokit.rest.pulls.list({
+  let _ = stopwatch(
+    `octokit.rest.pulls.list ${{ owner, repo, state, sort, per_page }}`
+  );
+
+  const { data, status } = await octokit.rest.pulls.list({
     owner,
     repo,
     state,
     sort,
     per_page,
   });
+  _();
 
   if (status !== 200)
     throw new Error(`(${status}) error getting pull requests`);
