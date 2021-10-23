@@ -1,4 +1,4 @@
-import alfy, { ScriptFilterItem } from 'alfy';
+import alfy from 'alfy';
 import { useCache } from './lib/cache.js';
 import {
   getPullRequests as _getPullRequests,
@@ -47,7 +47,7 @@ let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
 });
 
 const query = alfy.input?.toLowerCase();
-if (query) {
+if (query && query.length) {
   filteredPulls = filteredPulls.filter((pr) => {
     return [pr.body, pr.title]
       .filter(Boolean)

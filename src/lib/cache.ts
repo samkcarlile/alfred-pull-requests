@@ -1,7 +1,7 @@
-import { exists, getModificationTime, readJson, writeJson } from './util.js';
-import { join } from 'path';
 import { existsSync, mkdirSync, rmSync } from 'fs';
 import md5 from 'md5';
+import { join } from 'path';
+import { exists, getModificationTime, readJson, writeJson } from './util.js';
 
 const cacheRoot = join(process.cwd(), process.env['CACHE'] ?? '.cache');
 if (!existsSync(cacheRoot)) mkdirSync(cacheRoot);
@@ -19,17 +19,19 @@ export function useCache<T extends (...args: any[]) => Promise<any>>(
   return (async (...args: any[]) => {
     const callHash = md5(fn.name + JSON.stringify(args));
     const cacheFile = join(process.cwd(), `.cache/${callHash}.json`);
+
     if (await exists(cacheFile)) {
       const updated = await getModificationTime(cacheFile);
       const delta = Date.now() - updated.getTime();
       if (delta <= expires) {
-        return readJson<T>(cacheFile, reviver);
+        let result = await readJson<T>(cacheFile, reviver);
+        return result;
       }
-    } else {
-      const result = await fn(...args);
-      await writeJson(cacheFile, result);
-      return result;
     }
+
+    const result = await fn(...args);
+    await writeJson(cacheFile, result);
+    return result;
   }) as T;
 }
 

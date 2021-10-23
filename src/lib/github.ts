@@ -1,6 +1,4 @@
 import { Octokit, RestEndpointMethodTypes } from '@octokit/rest';
-import { config as dotenv } from 'dotenv';
-dotenv();
 import { stopwatch } from './debug.js';
 
 type ElementOf<T extends any[]> = T extends (infer E)[] ? E : T;
