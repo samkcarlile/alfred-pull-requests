@@ -48,6 +48,7 @@ let filteredPulls: PullRequest[] = pullRequestsByRepo.flat().sort((a, b) => {
 
 const query = alfy.input?.toLowerCase();
 if (query && query.length) {
+  // TODO: more sophisticated querying: identify tokens and match the to properties
   filteredPulls = filteredPulls.filter((pr) => {
     return [pr.body, pr.title]
       .filter(Boolean)
