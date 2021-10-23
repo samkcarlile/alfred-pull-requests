@@ -13,6 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^26.0.23",
+    "@types/md5": "^2.3.1",
     "@types/node": "^15.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
@@ -27,6 +28,7 @@
   "dependencies": {
     "@octokit/rest": "^18.12.0",
     "alfy": "^0.12.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "md5": "^2.3.0"
   }
 }

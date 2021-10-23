@@ -1,19 +1,18 @@
-import alfy from 'alfy';
+import alfy, { ScriptFilterItem } from 'alfy';
+import { useCache } from './lib/cache.js';
+import {
+  getPullRequests as _getPullRequests,
+  parsePullRequestUrl,
+  PullRequest,
+} from './lib/github.js';
 import {
   formatDateRelative,
   getIconPath,
   ordinalScale,
   reviveDateProperties,
 } from './lib/util.js';
-import {
-  getPullRequests as _getPullRequests,
-  parsePullRequestUrl,
-  PullRequest,
-} from './lib/github.js';
-import { useCache } from './lib/cache.js';
 
 const getPullRequests = useCache(_getPullRequests, {
-  key: 'pull_requests',
   expires: 1000 * 60,
   reviver: reviveDateProperties<PullRequest>([
     'updated_at',
@@ -55,15 +54,13 @@ alfy.output(
     const { repo } = parsePullRequestUrl(pr.url);
 
     return {
+      uid: pr.node_id,
       title,
       subtitle: `${repo} – by ${author} – Updated ${relativeDate}`,
       arg: pr.html_url,
       icon: { path: getIconPath(pr.state) },
     };
   })
-  // {
-  //   rerunInterval: 1,
-  // }
 );
 
 export {};
