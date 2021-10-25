@@ -1,0 +1,31 @@
+diff --git a/node_modules/alfy/index.d.ts b/node_modules/alfy/index.d.ts
+index 8ecdf23..da7df26 100644
+--- a/node_modules/alfy/index.d.ts
++++ b/node_modules/alfy/index.d.ts
+@@ -25,6 +25,11 @@ export interface OutputOptions {
+ 	The script will only be re-run if the script filter is still active and the user hasn't changed the state of the filter by typing and triggering a re-run. For example, it could be used to update the progress of a particular task:
+ 	*/
+ 	readonly rerunInterval?: number;
++
++	/**
++	 Variables can be passed out of the script filter within a variables object. This is useful for two things. Firstly, these variables will be passed out of the script filter's outputs when actioning a result. Secondly, any variables passed out of a script will be passed back in as environment variables when the script is run within the same session. This can be used for very simply managing state between runs as the user types input or when the script is set to re-run after an interval.
++	 */
++	readonly variables?: Record<string, any>;
+ }
+ 
+ export interface CacheConfGetOptions {
+diff --git a/node_modules/alfy/index.js b/node_modules/alfy/index.js
+index b49867a..7ea20b6 100644
+--- a/node_modules/alfy/index.js
++++ b/node_modules/alfy/index.js
+@@ -41,8 +41,8 @@ alfy.alfred = {
+ 
+ alfy.input = process.argv[2];
+ 
+-alfy.output = (items, {rerunInterval} = {}) => {
+-	console.log(JSON.stringify({items, rerun: rerunInterval}, null, '\t'));
++alfy.output = (items, {variables, rerunInterval} = {}) => {
++	console.log(JSON.stringify({items, rerun: rerunInterval, variables}, null, '\t'));
+ };
+ 
+ alfy.matches = (input, list, item) => {
