@@ -1,5 +1,5 @@
 import alfy from 'alfy';
-import { useCache } from './lib/cache.js';
+import { swrOptions, withSWR } from './lib/swr.js';
 import {
   getPullRequests as _getPullRequests,
   parsePullRequestUrl,
@@ -12,8 +12,7 @@ import {
   reviveDateProperties,
 } from './lib/util.js';
 
-const getPullRequests = useCache(_getPullRequests, {
-  expires: 1000 * 60,
+const getPullRequests = withSWR(_getPullRequests, {
   reviver: reviveDateProperties<PullRequest>([
     'updated_at',
     'created_at',
@@ -81,7 +80,8 @@ alfy.output(
       arg: pr.html_url,
       icon: { path: getIconPath(pr.state) },
     };
-  })
+  }),
+  swrOptions()
 );
 
 export {};
